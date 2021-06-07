@@ -27,6 +27,8 @@ Made with Python 3, MySQL, Open Food Facts' API
 
 *Installation walkthrough, setup and config - include screenshots*
 
+https://world.openfoodfacts.org/files/api-documentation.html
+
  This version works with French data; to change to the language of your liking:
  > Example goes here
 
