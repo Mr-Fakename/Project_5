@@ -27,10 +27,14 @@ Made with Python 3, MySQL, Open Food Facts' API
 
 *Installation walkthrough, setup and config - include screenshots*
 
-https://world.openfoodfacts.org/files/api-documentation.html
+ This version works with French data; to change to the language of your liking, change the URL to include the country code you want:
+  ``` python 
+def get_data(self):  
+	url = "https://fr.openfoodfacts.org/cgi/search.pl?"  
+```
 
- This version works with French data; to change to the language of your liking:
- > Example goes here
+For more information about search options and parameters:
+> https://world.openfoodfacts.org/data
 
 ## **User Manual** 
 
@@ -57,6 +61,7 @@ If 2 is selected:
  - All product data comes from [Open Food Facts](https://world.openfoodfacts.org)
  - This version makes use of the good ol' command prompt
  - Use only numbers to navigate in the app
-   
+ 
+
 
 
