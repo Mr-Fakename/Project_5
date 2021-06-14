@@ -8,7 +8,7 @@ def make_readable(cleaned_data):
         product["nutriscore_grade"] = product["nutriscore_grade"].upper()
 
         product["brands"] = str(list(map(str.strip, product["brands"].title().split(','))))
-        product["categories"] = str(list(map(str.strip, product["categories"].split(','))))
+        product["categories"] = ", ".join(map(str.strip, product["categories"].split(',')))
         product["stores"] = str(list(map(str.strip, product["stores"].title().split(','))))
 
     return cleaned_data

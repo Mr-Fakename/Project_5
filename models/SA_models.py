@@ -1,7 +1,7 @@
-# from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy import Column, Integer, ForeignKey, String
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
+from sqlalchemy.ext.hybrid import hybrid_property
 
 
 Base = declarative_base()
@@ -15,12 +15,6 @@ class User(Base):
 
     favourite_products = relationship("Favourite", cascade="all, delete-orphan", backref="user")
 
-    # def set_password(self, password):
-    #     self.password_hash = generate_password_hash(password)
-    #
-    # def check_password(self, password):
-    #     return check_password_hash(self.password_hash, password)
-
 
 class Product(Base):
     __tablename__ = "product"
@@ -32,6 +26,10 @@ class Product(Base):
     nutriscore_grade = Column(String(1))
     product_name_fr = Column(String(200))
     stores = Column(String(100))
+
+    @hybrid_property
+    def url(self):
+        return "https://fr.openfoodfacts.org/produit/" + str(self.code)
 
 
 class Favourite(Base):
@@ -45,3 +43,10 @@ class Favourite(Base):
         self.product = product
 
     product = relationship("Product", lazy="joined")
+
+
+class Category(Base):
+    __tablename__ = "category"
+
+    id = Column(Integer, primary_key=True)
+    name = Column(String(50))
