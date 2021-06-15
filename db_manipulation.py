@@ -3,13 +3,15 @@ from models.clean_data import make_readable
 from models.SA_models import Product, User, Category, Favourite
 
 from sqlalchemy.orm import Session
-from sqlalchemy import create_engine, func
+from sqlalchemy import create_engine
 
 
 class Database:
     def __init__(self):
         self.engine = create_engine("sqlite:///models/project_5")
         self.session = Session(self.engine)
+
+        self.user = None
 
     def fill_db(self, cleaned_data):
 
@@ -47,43 +49,48 @@ class Database:
 
         self.session.commit()
 
-
-    # def query_db(self, nutriscore):
-    #     products = self.session.query(Product).filter_by(nutriscore_grade=nutriscore)
-    #     return [product for product in products]
-
     def create_user(self, username):
-        new_user = User(username=username)
+        new_user = User(username=username.capitalize())
         self.session.add(new_user)
         self.session.commit()
-        print("User created!")
+        print(f"User: {new_user.username}, created!")
 
-    def find_user(self, username):
-        # users = self.session.query(User).filter_by(username=username)
-        users = self.session.query(User).filter(User.username.ilike(f"%{username}%"))
-        return [user for user in users]
+    def find_user(self):
+        while self.user is None:
+            print("Please type your name to select your user profile:")
+            users = self.session.query(User).filter(User.username.ilike(f"%{input()}%"))
+            if len([user for user in users]) == 1:
+                self.user = [user for user in users][0]
+                print(f"Hello, {self.user.username}!")
+            elif len([user for user in users]) == 0:
+                print("No user was found; either because they don't exist, or you mistyped")
+                continue
+            else:
+                print("Your input returned several values, please choose below:")
+                print([user.username for user in users])
+                continue
 
-    def display_favourites(self, category):
-        # categories = self.session.query(Category).all()
+    def display_favourites(self):
+        return self.user.favourite_products
+
+    def display_products_in_category(self, category):
         products_in_category = self.session.query(Product).filter(Product.categories.ilike(f"%{category}%"))
         return [product for product in products_in_category]
 
-    def display_product(self):
-        pass
+    def add_favourite(self, product):
+        self.user.favourite_products.append(Favourite(product))
 
-    def add_favourite(self):
-        pass
-
-    def delete_favourite(self):
-        pass
+    def delete_favourite(self, favourite):
+        self.display_favourites().remove(favourite)
 
     def display_categories(self):
         categories = self.session.query(Category).all()
-        return categories
+        return [category.name for category in categories]
 
-    def display_replacement(self):
-        pass
-
+    def display_replacement(self, product):
+        print(product.product_name_fr, product.nutriscore_grade)
+        query = self.session.query(Product).filter(Product.nutriscore_grade < product.nutriscore_grade)
+        return [result for result in query]
 
 # myAPI = API()
 # myAPI.get_data()
@@ -91,12 +98,6 @@ class Database:
 # cleaned_data = make_readable(myAPI.cleaned_data)
 
 db = Database()
-categories = db.display_categories()
-for category in categories:
-    print(category.name)
-# db.fill_db(cleaned_data)
-# product = db.query_db("E")[0]
-# db.create_user("John")
-# users = db.find_user(input())
-# products = db.display_categories()
-query = db.display_favourites(input())
+db.find_user()
+products = db.display_products_in_category("sauces")
+product = products[0]
