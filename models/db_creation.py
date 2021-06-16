@@ -1,11 +1,7 @@
-from models.SA_models import Base
-
 from sqlalchemy import create_engine
+import base_model
+import users_model, products_model, categories_model, favourites_model
 
 
-def create_db(base, db_name):
-    engine = create_engine("sqlite:///" + db_name)
-    base.metadata.create_all(engine)
-
-
-create_db(Base, "project_5")
+engine = create_engine("sqlite:///" + "project_5_db")
+base_model.Base.metadata.create_all(engine)

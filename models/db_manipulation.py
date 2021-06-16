@@ -1,14 +1,17 @@
-from models.api_calls import API
-from models.clean_data import make_readable
-from models.SA_models import Product, User, Category, Favourite
-
 from sqlalchemy.orm import Session
 from sqlalchemy import create_engine
+
+from .api_caller import API
+from .api_data_cleaner import make_readable
+from .users_model import User
+from .products_model import Product
+from .categories_model import Category
+from .favourites_model import Favourite
 
 
 class Database:
     def __init__(self):
-        self.engine = create_engine("sqlite:///models/project_5")
+        self.engine = create_engine("sqlite:///models/project_5_db")
         self.session = Session(self.engine)
 
         self.user = None
@@ -55,7 +58,7 @@ class Database:
         self.session.commit()
         print(f"User: {new_user.username}, created!")
 
-    def find_user(self):
+    def get_user(self):
         while self.user is None:
             print("Please type your name to select your user profile:")
             users = self.session.query(User).filter(User.username.ilike(f"%{input()}%"))
@@ -70,10 +73,10 @@ class Database:
                 print([user.username for user in users])
                 continue
 
-    def display_favourites(self):
+    def get_favourites(self):
         return self.user.favourite_products
 
-    def display_products_in_category(self, category):
+    def get_products_in_category(self, category):
         products_in_category = self.session.query(Product).filter(Product.categories.ilike(f"%{category}%"))
         return [product for product in products_in_category]
 
@@ -81,23 +84,13 @@ class Database:
         self.user.favourite_products.append(Favourite(product))
 
     def delete_favourite(self, favourite):
-        self.display_favourites().remove(favourite)
+        self.get_favourites().remove(favourite)
 
-    def display_categories(self):
+    def get_categories(self):
         categories = self.session.query(Category).all()
         return [category.name for category in categories]
 
-    def display_replacement(self, product):
+    def get_replacement(self, product):
         print(product.product_name_fr, product.nutriscore_grade)
         query = self.session.query(Product).filter(Product.nutriscore_grade < product.nutriscore_grade)
         return [result for result in query]
-
-# myAPI = API()
-# myAPI.get_data()
-# myAPI.cleaner()
-# cleaned_data = make_readable(myAPI.cleaned_data)
-
-db = Database()
-db.find_user()
-products = db.display_products_in_category("sauces")
-product = products[0]
