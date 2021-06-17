@@ -37,12 +37,9 @@ class Database:
         categories = [category for sublist in categories for category in sublist]
         categories = sorted(categories, key=categories.count, reverse=True)
 
-        def duplicate_removal(iterable):
-            seen = set()
-            seen_add = seen.add
-            return [x for x in iterable if not (x in seen or seen_add(x))][:14]
-
-        categories = duplicate_removal(categories)
+        seen = set()
+        seen_add = seen.add
+        categories = [x for x in categories if not (x in seen or seen_add(x))][:14]
 
         for category in categories:
             new_category = Category(
@@ -80,17 +77,19 @@ class Database:
         products_in_category = self.session.query(Product).filter(Product.categories.ilike(f"%{category}%"))
         return [product for product in products_in_category]
 
-    def add_favourite(self, product):
-        self.user.favourite_products.append(Favourite(product))
+    def add_favourite(self, product, replaced):
+        self.user.favourite_products.append(Favourite(product, replaced))
+        self.session.commit()
 
     def delete_favourite(self, favourite):
-        self.get_favourites().remove(favourite)
+        self.user.favourite_products.remove(favourite)
+        self.session.commit()
 
     def get_categories(self):
         categories = self.session.query(Category).all()
         return [category.name for category in categories]
 
-    def get_replacement(self, product):
-        print(product.product_name_fr, product.nutriscore_grade)
-        query = self.session.query(Product).filter(Product.nutriscore_grade < product.nutriscore_grade)
+    def get_replacement(self, product, category):
+        query = self.session.query(Product).filter(Product.nutriscore_grade < product.nutriscore_grade,
+                                                   Product.categories.ilike(f"%{category}%"))
         return [result for result in query]
