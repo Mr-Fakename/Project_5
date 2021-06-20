@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from sqlalchemy import create_engine, exc
+from sqlalchemy import create_engine
 
 from .users_model import User
 from .products_model import Product
@@ -47,15 +47,10 @@ class Database:
 
         self.session.commit()
 
-    def add_user(self, username):
-        try:
-            new_user = User(username=username.capitalize())
-            self.session.add(new_user)
-            self.session.commit()
-            return new_user
-        except exc.IntegrityError as e:
-            self.session.rollback()
-            return e
+    @staticmethod
+    def add_user(username):
+        new_user = User(username=username.capitalize())
+        return new_user
 
     def get_user(self):
         users = self.session.query(User).filter(User.username.ilike(f"%{input()}%"))
@@ -69,11 +64,7 @@ class Database:
         return [product for product in products_in_category]
 
     def add_favourite(self, replacement, replaced):
-        try:
-            self.user.favourite_products.append(Favourite(replacement, replaced))
-            self.session.commit()
-        except exc.IntegrityError as e:
-            self.session.rollback()
+        return self.user.favourite_products.append(Favourite(replacement, replaced))
 
     def delete_favourite(self, favourite):
         self.user.favourite_products.remove(favourite)
