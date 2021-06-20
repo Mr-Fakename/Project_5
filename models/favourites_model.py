@@ -10,8 +10,8 @@ class Favourite(Base):
     product_id = Column(Integer, ForeignKey('product.id'), primary_key=True)
     replaced_product = Column(Integer)
 
-    def __init__(self, product, replaced_product):
-        self.product = product
+    def __init__(self, replacement, replaced_product):
+        self.product = replacement
         self.replaced_product = replaced_product.id
 
     product = relationship("Product", lazy="joined")

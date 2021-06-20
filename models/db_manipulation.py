@@ -1,8 +1,6 @@
 from sqlalchemy.orm import Session
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, exc
 
-from .api_caller import API
-from .api_data_cleaner import make_readable
 from .users_model import User
 from .products_model import Product
 from .categories_model import Category
@@ -49,26 +47,19 @@ class Database:
 
         self.session.commit()
 
-    def create_user(self, username):
-        new_user = User(username=username.capitalize())
-        self.session.add(new_user)
-        self.session.commit()
-        print(f"User: {new_user.username}, created!")
+    def add_user(self, username):
+        try:
+            new_user = User(username=username.capitalize())
+            self.session.add(new_user)
+            self.session.commit()
+            return new_user
+        except exc.IntegrityError as e:
+            self.session.rollback()
+            return e
 
     def get_user(self):
-        while self.user is None:
-            print("Please type your name to select your user profile:")
-            users = self.session.query(User).filter(User.username.ilike(f"%{input()}%"))
-            if len([user for user in users]) == 1:
-                self.user = [user for user in users][0]
-                print(f"Hello, {self.user.username}!")
-            elif len([user for user in users]) == 0:
-                print("No user was found; either because they don't exist, or you mistyped")
-                continue
-            else:
-                print("Your input returned several values, please choose below:")
-                print([user.username for user in users])
-                continue
+        users = self.session.query(User).filter(User.username.ilike(f"%{input()}%"))
+        return users
 
     def get_favourites(self):
         return self.user.favourite_products
@@ -77,9 +68,12 @@ class Database:
         products_in_category = self.session.query(Product).filter(Product.categories.ilike(f"%{category}%"))
         return [product for product in products_in_category]
 
-    def add_favourite(self, product, replaced):
-        self.user.favourite_products.append(Favourite(product, replaced))
-        self.session.commit()
+    def add_favourite(self, replacement, replaced):
+        try:
+            self.user.favourite_products.append(Favourite(replacement, replaced))
+            self.session.commit()
+        except exc.IntegrityError as e:
+            self.session.rollback()
 
     def delete_favourite(self, favourite):
         self.user.favourite_products.remove(favourite)
