@@ -1,4 +1,11 @@
 class Colors:
+    """ Class that contains styling and color coding for strings inside the Python Console
+        To be used in a f string, as follows:
+
+        f"{Colors.STYLE}{Colors.COLOR}some string example {Colors.NORMAL}"
+
+        Styling is optional; but NORMAL has to be used to reset after the desired string formatting
+    """
 
     # TEXT STYLES
     NORMAL = '\033[0m'
@@ -6,7 +13,7 @@ class Colors:
     ITALIC = '\033[3m'
     UNDERLINE = '\033[4m'
 
-    # TEXT COLOURS
+    # TEXT COLORS
     BLACK = '\033[30m'
     RED = '\033[31m'
     GREEN = '\033[92m'
