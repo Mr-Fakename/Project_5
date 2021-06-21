@@ -8,6 +8,11 @@ from .favourites_model import Favourite
 
 
 class Database:
+    """
+    Class that connects to the database and contains all the methods to interact with it, via
+    the SQLAlchemy ORM
+    """
+
     def __init__(self):
         self.engine = create_engine("sqlite:///models/project_5_db")
         self.session = Session(self.engine)
@@ -15,7 +20,13 @@ class Database:
         self.user = None
 
     def fill_db(self, cleaned_data):
+        """
+        This function is the link between API data and the database
+        The cleaned data in entry is JSON and each key/value keeps the same name in the DB
 
+        Categories are obtained by keeping track of how many times they appear for each product,
+        sorting them by count and keeping the 15 most represented
+        """
         categories = []
 
         for product in cleaned_data:
@@ -28,16 +39,17 @@ class Database:
                 stores=product["stores"]
             )
             self.session.add(new_product)
-            categories.append(new_product.categories.split(", ")[:2])
+            categories.append(new_product.categories.split(", ")[:1])
 
         self.session.commit()
 
         categories = [category for sublist in categories for category in sublist]
         categories = sorted(categories, key=categories.count, reverse=True)
 
+        # The 3 following lines delete duplicate categories and keep them in order
         seen = set()
         seen_add = seen.add
-        categories = [x for x in categories if not (x in seen or seen_add(x))][:14]
+        categories = [x for x in categories if not (x in seen or seen_add(x))][:15]
 
         for category in categories:
             new_category = Category(
@@ -76,5 +88,6 @@ class Database:
 
     def get_replacement(self, product, category):
         query = self.session.query(Product).filter(Product.nutriscore_grade < product.nutriscore_grade,
-                                                   Product.categories.ilike(f"%{category}%"))
+                                                   Product.categories.ilike(f"%{category}%")
+                                                   )
         return [result for result in query]

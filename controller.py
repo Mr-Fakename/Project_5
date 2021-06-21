@@ -7,6 +7,10 @@ from views import Colors
 
 
 class Control:
+    """
+    This class bridges the gap between user input and SQLAlchemy's ORM
+    """
+
     def __init__(self, db):
         self.db = db
         self.run = True
@@ -16,6 +20,11 @@ class Control:
         self.lower_separator = f"{Colors.BLACK}---------------------------------------------------------------{Colors.NORMAL} \n"
 
     def validate_input(self, prompt="", *args, **kwargs):
+        """ Makes sure that the user's input is a number
+        Returns the choice if valid, or outputs an error message and reloads the current menu
+        *args and **kwargs keep the relevant previous inputs so the user doesn't have to
+        restart when the menu reloads
+        """
         try:
             choice = int(input(prompt))
             return choice
@@ -27,6 +36,11 @@ class Control:
             self.current_menu(*args, **kwargs)
 
     def reload_menu(self, *args, **kwargs):
+        """ Function that's called when the user types a number out of range
+        Displays an error message, then reloads the current menu
+        *args and **kwargs keep the relevant previous inputs so the user doesn't have to
+        restart when the menu reloads
+        """
         print(self.upper_separator)
         print(f"{Colors.YELLOW}Il semblerait que vous ayez tapé un mauvais nombre, veuillez réessayer{Colors.NORMAL}")
         print(self.lower_separator)
@@ -301,6 +315,6 @@ class Control:
 
     def quit(self):
         print(self.upper_separator)
-        print(f"{Colors.CYAN}Au revoir!")
+        print(f"{Colors.PURPLE}Au revoir!")
         print(self.lower_separator)
         self.run = False
