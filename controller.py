@@ -14,6 +14,9 @@ class Control:
     def __init__(self, db):
         self.db = db
         self.run = True
+
+        # self.current_menu is updated with every "menu" class method. It keeps track of where the user is in the
+        # program, so reloading functions don't send them back at the beginning
         self.current_menu = None
 
         self.upper_separator = f"{Colors.BLACK}\n---------------------------------------------------------------{Colors.NORMAL}"
@@ -47,6 +50,7 @@ class Control:
         self.current_menu(*args, **kwargs)
 
     def starting_menu(self):
+        """ Where the program begins, from there flow control is done with validated numbers"""
         self.current_menu = self.starting_menu
         prompt = f"{Colors.PURPLE}1 - Réinitialiser la base de données \n" \
                  f"{Colors.BLUE}2 - Créer un utilisateur \n" \
@@ -93,6 +97,10 @@ class Control:
             self.reload_menu()
 
     def favourites_menu(self):
+        """ This menu gets a list of Favourite objects associated with the User, then displays selected data on screen
+        The user is given the option to choose a favourite, using a list index
+        If so, the chosen favourite object is passed to the favourite_details_menu
+        """
         self.current_menu = self.favourites_menu
         prompt = "Voici la liste des produits que vous avez enregistrés. \n" \
                  "Entrez un numéro pour obtenir les détails de ce produit, \n" \
@@ -116,6 +124,10 @@ class Control:
                 self.reload_menu()
 
     def favourite_details_menu(self, favourite):
+        """ Takes a Favourite object as input, passed from the favourite_menu() function
+        Chosen data is displayed by accessing attributes: favourite.product.KEY
+        The user can then move on to another menu or delete this favourite
+        """
         self.current_menu = self.favourite_details_menu
         print(self.upper_separator)
         print(f"{Colors.BLACK}Voici les détails du favori que vous avez sélectionné:{Colors.NORMAL} \n"
@@ -158,6 +170,10 @@ class Control:
             self.reload_menu()
 
     def categories_menu(self):
+        """ This menu maps category names obtained in db_manipulation.get_categories() with numbers
+        The user can then select a category by its number, which is passed to products_menu() to run
+        a SQL SELECT statement
+        """
         self.current_menu = self.categories_menu
         prompt = "Entrez un numéro pour obtenir les produits faisant partie de cette catégorie, \n" \
                  f"{Colors.RED}ou 0 pour fermer le programme{Colors.NORMAL}: \n"
@@ -176,6 +192,11 @@ class Control:
                 self.reload_menu()
 
     def products_menu(self, category):
+        """ This menu makes use of the "category" parameter passed from categories_menu() to obtain
+        Product objects belonging to this category
+        15 of them are kept using a list slice, and displayed with a number that the user can choose
+        Chosen product is passed to substitutes_menu(), along with the category
+        """
         self.current_menu = self.products_menu
         prompt = "Entrez un numéro pour sélectionner un produit et obtenir des suggestions plus saines, \n" \
                  f"{Colors.RED}ou 0 pour fermer le programme{Colors.NORMAL}: \n"
@@ -194,6 +215,15 @@ class Control:
                 self.reload_menu(category)
 
     def substitutes_menu(self, product, category):
+        """ This menu uses the product and category parameters to run a SQL statement, selecting
+        Product objects with a better nutriscore, belonging to the same category as the product
+
+        If the chosen product has a nutriscore of "A", a custom message is displayed, and the
+        SQLAlchemy comparison filter changes from "<" to "==" to avoid a comparison error
+
+        20 of the Product objects are kept using a list slice, and displayed with a number that the user can choose
+        Chosen replacement product is passed to substitute_details_menu(), along with the initially chosen product
+        """
         self.current_menu = self.substitutes_menu
         prompt = "Entrez un numéro pour sélectionner un produit et afficher ses informations, \n" \
                  "ou 0 pour fermer le programme: \n"
@@ -219,6 +249,12 @@ class Control:
                 self.reload_menu(product, category)
 
     def substitute_details_menu(self, product, substitute):
+        """ This menu compares the two Product object passed as parameters
+        If the user chooses to register the substitute in their favourites, a new Favourite object is
+        created, and added to the User's Favourite collection
+        The substituted product is kept in the relationship as well, for reference
+        """
+
         self.current_menu = self.substitute_details_menu
         print(self.upper_separator)
         print(f"{Colors.BLACK}Voici le produit pour lequel vous vouliez trouver un substitut: {Colors.NORMAL}\n"
@@ -244,6 +280,11 @@ class Control:
             self.reload_menu(product, substitute)
 
     def add_favourite(self, replacement, replaced):
+        """ See db_manipulation.add_favourite()
+        If the action is successful, a Favourite object is created and a message is displayed
+        If the Favourite object already exists, SQLAlchemy throws an IntegrityError, and the session reverts back
+        """
+
         try:
             self.db.add_favourite(replacement, replaced)
             self.db.session.commit()
@@ -257,6 +298,8 @@ class Control:
             print(self.lower_separator)
 
     def initialise_db(self):
+        """ See in models"""
+
         print(self.upper_separator)
         print("Initialisation de la base de données...")
         create_db()
@@ -272,6 +315,15 @@ class Control:
         print(self.lower_separator)
 
     def authenticate(self):
+        """ Associates a User object to the session, to retrieve their favourites, and make
+        Favourite creation possible
+        User is found by matching a SQL query in the user table with an input()
+
+        If 1 object is returned, this object becomes the User
+        If 2 are returned, options are displayed and the user is asked to select the corresponding one
+        If 0 are returned, the user is asked to check for spelling errors
+        """
+
         while self.db.user is None:
             print(self.upper_separator)
             print("Entrez votre nom pour accéder à vos favoris:")
@@ -295,6 +347,12 @@ class Control:
                 continue
 
     def create_user(self):
+        """ User is asked to input a name, that the function attempts to register as a new User object's username
+        If the action is successful, a User object is created and a message is displayed, the new User
+        becomes the user for the session
+        If a User with this name already exists, SQLAlchemy throws an IntegrityError, and the session reverts back
+        """
+
         print(self.upper_separator)
         print("Entrez un nom d'utilisateur:")
         print(self.lower_separator)
