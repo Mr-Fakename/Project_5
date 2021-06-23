@@ -102,12 +102,6 @@ The main scenario is as follows:
 
 
 
-## **Features**
+## **Others**
 
- - All product data comes from [Open Food Facts](https://world.openfoodfacts.org)
- - This version makes use of the good ol' command prompt
- - Use only numbers to navigate in the app
- 
-
-
-
+- Link to [Trello](https://trello.com/b/KTZ2iu0e/project-5) board for this project
