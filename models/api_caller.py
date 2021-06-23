@@ -34,7 +34,7 @@ class API:
 
         self.raw_data = [{key: value for key, value in product.items() if value} for product in self.raw_data["products"]]
 
-        tags = ['brands', 'categories', 'code', 'nutriscore_grade', 'product_name_fr', 'stores', 'url']
+        tags = ['brands', 'categories', 'code', 'nutriscore_grade', 'product_name_fr', 'stores']
 
         for product in self.raw_data:
             if all(key in product for key in tags):
