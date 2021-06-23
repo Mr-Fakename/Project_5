@@ -9,4 +9,6 @@ class User(Base):
     id = Column(Integer, primary_key=True)
     username = Column(String(30), unique=True, nullable=False)
 
-    favourite_products = relationship("Favourite", cascade="all, delete-orphan", backref="user")
+    favourite_products = relationship("Favourite",
+                                      cascade="all, delete-orphan",
+                                      backref="user")

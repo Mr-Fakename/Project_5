@@ -2,7 +2,7 @@ from sqlalchemy import exc
 
 from models.api_caller import API
 from models.api_data_cleaner import make_readable
-from models.db_creation import *
+from models.db_creation import create_db
 from views import Colors
 
 
