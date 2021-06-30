@@ -59,14 +59,14 @@ They correspond to keys in the JSON doc returned by the API.
 ---
 To change of database management system, database name or location, modify the parameters passed to SQLAlchemy's *create_engine()* function:
 
-> In models/db_creation.py
+> In models/db_creation.py, line 13
 
 ``` python 
 def  create_db():
 	 engine  =  create_engine("sqlite:///models/project_5_db")
 ```
 
-> In models/db_manipulation.py
+> In models/db_manipulation.py, line 17
 
 ``` python 
 class  Database:
@@ -80,13 +80,23 @@ create_engine("mysql:///folder/thisisadbname")
 
 ## **User Manual** 
 
+**Installation**
+
+Clone the repository, create and activate a virtual environment.
+<pre> python -m venv environment_name </pre>
+
+Install the required libraries by typing:
+<pre> pip install -r requirements.txt </pre>
+
+To create and fill the database:
+<pre> python -m models.standalone_db_script </pre>
+
+---
 As this is a pretty simple program, usage is very straightforward.
 
 Interaction with the program is done on the Python console, using numbers.
 
 The starting menu asks the user to choose between initialising the database, creating/connecting to a user account, or quitting.
-
-**If this is the first time you're using the app, please create the database before proceeding further.**
 
 Creating a user will allow you to save a favourite in the database, and retrieve it in a dedicated menu.
 To access your favourites, just type the username you have chosen when starting the program.
@@ -102,6 +112,12 @@ The main scenario is as follows:
 
 
 
-## **Others**
+## **Features**
 
-- Link to [Trello](https://trello.com/b/KTZ2iu0e/project-5) board for this project
+ - All product data comes from [Open Food Facts](https://world.openfoodfacts.org)
+ - This version makes use of the good ol' command prompt
+ - Use only numbers to navigate in the app
+ 
+
+
+
