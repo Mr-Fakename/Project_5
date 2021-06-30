@@ -108,7 +108,7 @@ class Control:
         print(self.upper_separator + "\n" + prompt + self.lower_separator)
         favourites = self.db.get_favourites()
         for num, favourite in enumerate(favourites, start=2):
-            print(f"{num} - {Colors.BLUE}{favourite.product.product_name_fr}{Colors.NORMAL} - {favourite.product.brands} \n"
+            print(f"{num} - {Colors.BLUE}{favourite.product.product_name_fr}{Colors.NORMAL} - {favourite.product.brands} \n "
                   f"    En remplacement de {Colors.CYAN}{[product.product_name_fr for product in self.db.session.query(Product).filter(Product.id.ilike(favourite.replaced_product))]}{Colors.NORMAL}")
         print(self.lower_separator)
         choice = self.validate_input()
